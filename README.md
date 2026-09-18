@@ -14,7 +14,7 @@ The project includes a sample Google Spreadsheet with synthetic payroll, attenda
 
 ### Online Demo Google Sheet
 
-**[Open the Demo Google Sheet](YOUR_DEMO_GOOGLE_SHEET_LINK)**
+**[Open the Demo Google Sheet](https://docs.google.com/spreadsheets/d/1vmRSuGGhDKH03uG0Z9rV7YQYeFVGhowwGIINr_mb9yk/edit?usp=sharing)**
 
 The spreadsheet is provided as a view-only demonstration.
 
