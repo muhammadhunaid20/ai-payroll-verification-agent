@@ -1,10 +1,12 @@
 # AI Payroll Verification Agent
 
-A goal-driven **AI Payroll Verification Agent** built with Python, LLMs, function calling, Google Sheets API, and human-in-the-loop approval.
+A goal-driven AI Payroll Verification Agent built with Python, LLMs, function calling, Google Sheets API, and human-in-the-loop approval.
 
-This project demonstrates how an **AI Agent** can verify payroll prepared by a payroll officer by accessing attendance, sales, payroll, and business policy data, validating payroll values against current rules, identifying discrepancies, explaining results using available evidence, and updating payroll only after explicit human approval.
+The agent understands a user's payroll verification goal, dynamically selects the tools required to retrieve attendance, sales, payroll, and business policy data, and uses deterministic Python verification logic to validate payroll entries. It identifies discrepancies, explains results using available evidence, and requires explicit human approval before making payroll updates.
 
-The project is a practical example of applying **Agentic AI to an enterprise payroll and business-process verification workflow**, combining LLM-based goal understanding and tool selection with deterministic Python verification logic and real-time business data.
+This project demonstrates a practical application of Agentic AI in an enterprise payroll and business-process workflow, combining LLM-based goal understanding and tool selection with controlled business logic, runtime policies, real-time business data, and human oversight.
+
+Unlike a fixed automation workflow, macro, VBA script, Power Query process, or predefined sequence, the agent starts from a business goal and uses available tools to determine the information required for verification. The LLM handles goal understanding and tool orchestration, while Python remains responsible for deterministic payroll verification and calculations.
 
 ---
 
