@@ -1,7 +1,0 @@
-*.json
-.env
-.env.*
-credentials.json
-token.json
-__pycache__/
-.ipynb_checkpoints/
