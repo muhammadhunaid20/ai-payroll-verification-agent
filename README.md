@@ -4,8 +4,6 @@ An **Agentic AI payroll verification system** built with **Python, LLM tool call
 
 The agent verifies payroll entries against payroll policies and business data, identifies discrepancies, and presents the verification result for **human review and approval**.
 
-> **Project 1 focuses on payroll verification, not autonomous payroll processing.**
-
 ---
 
 ## 1. Project Identity
