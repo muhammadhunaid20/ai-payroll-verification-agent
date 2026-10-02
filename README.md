@@ -523,5 +523,6 @@ Certified ERP Consultant | Business Analyst | AI Engineer
 
 * **LinkedIn Profile:** https://www.linkedin.com/in/muhammadhunaid
 * **LinkedIn Project:** https://www.linkedin.com/in/muhammadhunaid/details/projects/
+* **Github Profile:** https://github.com/muhammadhunaid20
 
-GitHub: `muhammadhunaid20`
+
