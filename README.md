@@ -515,10 +515,13 @@ This separation makes the project a practical example of **Agentic AI applied to
 
 ---
 
-## Author
+## LinkedIn
 
-**Muhammad Hunaid Haroon**
+**Author:** Muhammad Hunaid Haroon
 
-MBA | Certified ERP Professional | ERP & Business Process Consultant | Agentic AI Learner
+Certified ERP Consultant | Business Analyst | AI Engineer
+
+* **LinkedIn Profile:** https://www.linkedin.com/in/muhammadhunaid
+* **LinkedIn Project:** https://www.linkedin.com/in/muhammadhunaid/details/projects/
 
 GitHub: `muhammadhunaid20`
