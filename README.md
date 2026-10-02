@@ -1,766 +1,525 @@
 # AI Payroll Verification Agent
 
-A goal-driven AI Payroll Verification Agent built with Python, LLMs, function calling, Google Sheets API, and human-in-the-loop approval.
+An **Agentic AI payroll verification system** built with **Python, LLM tool calling, Google Sheets API, and OpenRouter API**.
 
-The agent understands a user's payroll verification goal, dynamically selects the tools required to retrieve attendance, sales, payroll, and business policy data, and uses deterministic Python verification logic to validate payroll entries. It identifies discrepancies, explains results using available evidence, and requires explicit human approval before making payroll updates.
+The agent verifies payroll entries against payroll policies and business data, identifies discrepancies, and presents the verification result for **human review and approval**.
 
-This project demonstrates a practical application of Agentic AI in an enterprise payroll and business-process workflow, combining LLM-based goal understanding and tool selection with controlled business logic, runtime policies, real-time business data, and human oversight.
-
-Unlike a fixed automation workflow, macro, VBA script, Power Query process, or predefined sequence, the agent starts from a business goal and uses available tools to determine the information required for verification. The LLM handles goal understanding and tool orchestration, while Python remains responsible for deterministic payroll verification and calculations.
+> **Project 1 focuses on payroll verification, not autonomous payroll processing.**
 
 ---
 
-## Demo & Test the Agent
+## 1. Project Identity
 
-The project includes a sample Google Spreadsheet with synthetic payroll, attendance, sales, and policy data.
+**AI Payroll Verification Agent** is an Agentic AI application for payroll teams.
 
-### Online Demo Google Sheet
+### Core Purpose
 
-**[Open the Demo Google Sheet](https://docs.google.com/spreadsheets/d/1vmRSuGGhDKH03uG0Z9rV7YQYeFVGhowwGIINr_mb9yk/edit?usp=sharing)**
+**Payroll Officer → prepares payroll → AI Agent verifies → discrepancies detected → Human reviews**
 
-The spreadsheet is provided as a view-only demonstration.
+The system combines:
 
-If you want to run the agent yourself:
-
-1. Open the demo Google Sheet.
-2. Select **File → Make a copy**.
-3. Save your own copy to Google Drive.
-4. Copy the ID of your new spreadsheet.
-5. Replace `YOUR_GOOGLE_SHEET_ID` in the notebook with your copied spreadsheet ID.
-6. Configure Google authentication and your LLM API key.
-7. Run the agent.
-
-The original demonstration spreadsheet remains unchanged while users can experiment safely with their own copy.
-
-### Demo Data Included
-
-The Google Spreadsheet contains separate business data for:
-
-```text
-Attendance
-Attendance_Policy
-Sales
-Commission_Policy
-Payroll
-```
-
-This separation represents a common enterprise scenario where payroll verification depends on information maintained across multiple business records.
+* **LLM** — understands the user's goal and determines what information/tools are required.
+* **AI Agent** — coordinates the workflow and tool execution.
+* **Tools** — retrieve payroll, policy, attendance, and sales data.
+* **Python** — performs deterministic payroll calculations and validation.
+* **Google Sheets API** — provides business data and payroll policies.
+* **OpenRouter API** — provides access to the LLM.
+* **Human-in-the-loop** — retains final business control.
 
 ---
 
-## Project Overview
+## 2. Business Problem
 
-Payroll verification often requires manual checking across several data sources.
+Payroll verification can involve manually checking:
 
-A payroll officer may prepare payroll while attendance, overtime, sales commission, and policy information are maintained separately. An incorrect value in one component can affect total earnings or deductions.
-
-This project introduces an AI-powered verification layer between payroll preparation and payroll finalization.
-
-Instead of simply calculating payroll from scratch, the agent addresses a practical business question:
-
-> **Is the payroll prepared by the payroll officer consistent with the available business data and applicable policies?**
-
-The agent can retrieve relevant information, determine which tools are needed, verify payroll values, identify differences, explain supported discrepancies, and wait for human approval before changing the payroll record.
-
----
-
-## What Makes This an AI Agent?
-
-This project is intentionally different from a traditional fixed automation workflow.
-
-A conventional automation might execute a predefined sequence:
-
-```text
-Read Sheet
-→ Calculate
-→ Write Result
-```
-
-This project introduces an LLM as the **goal-understanding and tool-selection layer**.
-
-The user provides a business goal such as:
-
-```text
-Verify payroll for employee EMP001 and explain any incorrect amounts.
-```
-
-The agent determines which available tools are relevant to the request, retrieves the required information, receives authoritative results from Python functions, and uses those results to produce a business-readable verification report.
-
-The high-level flow is:
-
-```text
-User Goal
-    ↓
-LLM Agent
-    ↓
-Tool / Function Selection
-    ↓
-Business Data
-    ↓
-Python Verification Logic
-    ↓
-Evidence-Based Result
-    ↓
-Human Approval
-    ↓
-Payroll Update
-```
-
-This makes the project a practical example of **goal-driven Agentic AI**, rather than simply a macro, VBA script, Power Query transformation, fixed Python automation, or predefined workflow.
-
----
-
-## Agentic Architecture
-
-```text
-                         ┌─────────────────────┐
-                         │      User Goal      │
-                         │ "Verify EMP001"     │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │     LLM Agent       │
-                         │ Goal Understanding  │
-                         │ Tool Selection      │
-                         └──────────┬──────────┘
-                                    │
-                         Function / Tool Calling
-                                    │
-              ┌─────────────────────┼─────────────────────┐
-              ▼                     ▼                     ▼
-       ┌─────────────┐       ┌─────────────┐       ┌──────────────┐
-       │ Attendance  │       │    Sales    │       │   Policies   │
-       │    Data     │       │    Data     │       │    Data      │
-       └──────┬──────┘       └──────┬──────┘       └──────┬───────┘
-              │                     │                     │
-              └─────────────────────┼─────────────────────┘
-                                    ▼
-                         ┌─────────────────────┐
-                         │ Python Verification │
-                         │ Deterministic Logic │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │ Verification Report │
-                         │ Current vs Expected │
-                         │ Differences         │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │   Human Approval    │
-                         └──────────┬──────────┘
-                                    │
-                         ┌──────────┴──────────┐
-                         ▼                     ▼
-                    Approved                Rejected
-                         │                     │
-                         ▼                     ▼
-                  Update Payroll             STOP
-```
-
----
-
-## Core Capabilities
-
-### 1. Payroll Verification
-
-The agent verifies payroll values prepared by a human payroll officer against underlying business data and applicable policies.
-
-It can validate:
-
-* Commission earnings
-* Overtime earnings
-* Total earnings
+* Payroll officer entries
+* Overtime calculations
 * Late-entry deductions
 * Early-exit deductions
-* Total deductions
+* Attendance rules
+* Sales commissions
+* Applicable payroll policies
+* Entered values versus expected values
 
-The system compares payroll values with expected values produced by the verification logic.
+Manual verification can result in calculation errors or missed discrepancies.
+
+The AI Payroll Verification Agent provides an additional verification layer before payroll is approved.
 
 ---
 
-### 2. Runtime Business Policies
+## 3. How the Agent Works
 
-Payroll rules are not permanently hard-coded into the agent's business logic.
+```text
+User Request
+     ↓
+AI Agent
+     ↓
+LLM understands the goal
+     ↓
+LLM selects required tools
+     ↓
+Tools retrieve Google Sheets data
+     ↓
+Python validates calculations and policies
+     ↓
+Expected values vs entered values
+     ↓
+Discrepancy Detection
+     ↓
+Verification Result
+     ↓
+Human Review / Approval
+```
 
-Attendance and commission policies are maintained in Google Sheets and retrieved at runtime.
+The agent does not simply generate a text response. It can determine which tools are required, execute those tools, use their results, and coordinate a multi-step verification workflow.
 
-Attendance policies can contain:
+---
 
-* Day type
-* Minimum payable hours
-* Maximum payable hours
-* Hourly rate
-* Multiplier
+## 4. Semantic Knowledge Model
+
+The project can be understood through these entities and relationships:
+
+```text
+AI Payroll Verification Agent
+    → is a → Agentic AI Application
+
+Agent
+    → uses → LLM
+    → executes → Tools
+    → coordinates → Verification Workflow
+
+LLM
+    → understands → User Goal
+    → selects → Tools
+    → interprets → Tool Results
+
+Tools
+    → retrieve → Payroll Data
+    → retrieve → Policy Data
+    → retrieve → Attendance Data
+    → retrieve → Sales Data
+
+Python
+    → performs → Deterministic Validation
+    → calculates → Expected Values
+    → compares → Entered vs Expected Values
+
+Validation
+    → detects → Payroll Discrepancies
+
+Discrepancy
+    → requires → Human Review
+
+Google Sheets API
+    → provides → Business Data
+
+OpenRouter API
+    → provides → LLM Access
+```
+
+This structure describes the project's concepts without claiming that the application itself implements a knowledge graph.
+
+---
+
+## 5. LLM vs Agent vs Tools vs Python
+
+These components have different responsibilities.
+
+| Component             | Responsibility                                                            |
+| --------------------- | ------------------------------------------------------------------------- |
+| **LLM**               | Understands requests, interprets goals, decides which tools may be needed |
+| **Agent**             | Coordinates the LLM, tools, workflow, and results                         |
+| **Tools**             | Perform specific business-data operations                                 |
+| **Python**            | Performs reliable calculations and deterministic validation               |
+| **Google Sheets API** | Reads business and policy data                                            |
+| **OpenRouter API**    | Connects the application with an LLM                                      |
+
+### Why separate LLM and Python?
+
+The LLM is useful for **understanding and reasoning about the task**.
+
+Python is used for **exact calculations and rule validation**.
+
+This reduces dependence on the LLM for calculations where deterministic code is more appropriate.
+
+---
+
+## 6. Payroll Verification
+
+The agent verifies payroll entries using policies and source data loaded from Google Sheets.
+
+### Example: Overtime
+
+Policy:
+
+```text
+Working Day OT
+Minimum = 2 hours
+Maximum = 4 hours
+Rate = Rs 200/hour
+```
+
+If an employee has **5 hours** of working-day overtime:
+
+```text
+Recorded OT = 5 hours
+Maximum payable OT = 4 hours
+Expected OT = 4 × Rs 200
+Expected amount = Rs 800
+```
+
+If the payroll officer entered a different amount, the agent identifies the discrepancy.
+
+### Example: Late Entry
+
+```text
+Late Entry Rate = Rs 250/hour
+Late Entry = 0.5 hour
+Expected Deduction = Rs 125
+```
+
+The system compares the expected amount with the payroll officer's entered amount.
+
+---
+
+## 7. Policy-Driven Validation
+
+Payroll policy values are **not hard-coded in Python**.
+
+The system loads applicable policy records from Google Sheets at runtime.
+
+Policies can contain:
+
+* Policy type
+* Minimum value
+* Maximum value
+* Rate
 * Effective date
 * Active status
 
-This allows business rules to be maintained separately from the Python implementation.
+The verification process considers the applicable **Active** policy and its **Effective From** date.
 
-A policy change can therefore be reflected through the business data source instead of requiring the developer to rewrite the verification logic.
-
----
-
-### 3. Effective-Date and Active-Policy Handling
-
-Attendance policies include an effective date and active status.
-
-The verification process uses policy information from the business data source rather than assuming that a rule is permanently valid.
-
-This reflects an important enterprise requirement: business rules can change over time and payroll verification should operate against the applicable policy data.
+This allows business rules to be maintained as data rather than modifying Python code whenever a policy changes.
 
 ---
 
-### 4. Overtime Validation
+## 8. Commission Verification
 
-The agent handles minimum and maximum payable overtime hours.
+The agent can also verify sales commission calculations against commission policies and sales data.
 
-For example:
+Example commission structure:
 
-```text
-Minimum payable hours = 2
-Maximum payable hours = 4
-Hourly rate = Rs. 200
-```
+| Sales Range     | Commission Rate |
+| --------------- | --------------: |
+| 0–50,000        |              2% |
+| 50,001–100,000  |              5% |
+| 100,001–500,000 |              7% |
 
-If an employee has:
-
-```text
-Actual overtime = 5 hours
-```
-
-the verification logic treats:
+The system can compare:
 
 ```text
-Payable overtime = 4 hours
-Excess overtime = 1 hour
-```
-
-Only the payable hours are included in expected overtime earnings.
-
-The agent reports excess hours when the Python verification result identifies them.
-
----
-
-### 5. Commission Verification
-
-Commission is verified using sales data and the commission policy stored in Google Sheets.
-
-The process is:
-
-```text
-Sales Records
-      ↓
-Sales Amount
-      ↓
+Sales Data
+    ↓
 Applicable Commission Policy
-      ↓
+    ↓
 Expected Commission
-      ↓
-Comparison with Payroll
+    ↓
+Payroll Officer's Commission
+    ↓
+Comparison
+    ↓
+Discrepancy / Verified
 ```
-
-The LLM does not independently invent or modify commission calculations.
-
-The Python verification result is treated as the authoritative calculation.
 
 ---
 
-## Evidence-Based AI Behavior
+## 9. Tool Calling
 
-A key design principle is:
+Tool calling allows the LLM to request specific application functions instead of attempting to perform every operation itself.
 
-> **The agent explains what the available data supports instead of inventing a reason for a discrepancy.**
-
-For example:
+Conceptually:
 
 ```text
-Commission
-Current:  Rs. 1,000
-Expected: Rs. 5,000
-Difference: Rs. -4,000
+User: Verify this payroll entry
+        ↓
+LLM: Determine required information
+        ↓
+Agent: Execute required tools
+        ↓
+Tools: Retrieve data
+        ↓
+Python: Validate calculations
+        ↓
+Agent: Return verification result
 ```
 
-The agent reports the values returned by the verification logic.
-
-It does not invent explanations such as:
-
-```text
-"The payroll officer probably forgot..."
-"The commission was likely entered incorrectly..."
-"The employee may have..."
-```
-
-unless such information is actually available in the underlying data.
-
-When the available information does not establish the reason, the agent states that the available data is insufficient to determine the reason.
-
-This provides a more controlled and auditable interaction between an LLM and enterprise business data.
+Tool arguments are exchanged as structured data, typically using **JSON**.
 
 ---
 
-## Deterministic Business Logic + LLM Reasoning
+## 10. API Architecture
 
-The project separates two responsibilities.
+The project uses two primary APIs:
 
-### LLM Agent
+### Google Sheets API
 
-The LLM is responsible for:
+Used for:
 
-* Understanding the user's goal
-* Selecting relevant tools
-* Determining which information is needed
-* Interpreting tool results
-* Communicating verification results
-* Explaining discrepancies using available evidence
+* Payroll data
+* Attendance data
+* Sales data
+* Payroll policies
+* Business records
 
-### Python Verification Layer
+### OpenRouter API
 
-Python is responsible for:
+Used as the LLM access layer.
 
-* Reading business data
-* Applying verification rules
-* Calculating expected values
-* Comparing actual and expected values
-* Returning structured verification results
-* Updating payroll after approval
-
-This separation keeps deterministic business calculations outside free-form LLM reasoning.
-
-The LLM acts as the **agentic decision and interaction layer**, while Python performs the controlled business verification.
-
----
-
-## Why This Is Different From Fixed Automation
-
-Traditional technologies such as VBA, Excel formulas, Power Query, fixed Python scripts, and predefined workflow automation can be useful for deterministic processes.
-
-This project addresses a different problem.
-
-The agent receives a business goal and has access to a set of controlled tools. The LLM determines which tools are relevant, while Python performs the authoritative verification.
-
-The architecture therefore separates:
+The application can work with an LLM available through OpenRouter rather than being tied to a single model provider.
 
 ```text
-Goal Understanding
-        +
-Tool Selection
-        +
-Business Verification
-        +
-Human Decision
+AI Payroll Agent
+      │
+      ├── OpenRouter API → LLM
+      │
+      └── Google Sheets API → Business Data
 ```
 
-rather than relying only on:
-
-```text
-Trigger
-→ Fixed Steps
-→ Fixed Output
-```
-
-The purpose is not to claim that traditional automation is ineffective. Instead, the project demonstrates where an LLM-driven agent can add a flexible goal-oriented interaction layer to an existing business process.
-
 ---
 
-## Human-in-the-Loop Payroll Approval
+## 11. Human-in-the-Loop
 
-Payroll changes are not automatically committed merely because the AI identifies a discrepancy.
-
-The project requires explicit human approval before updating payroll.
-
-The workflow is:
+The agent is designed as a **verification assistant**, not an autonomous payroll approver.
 
 ```text
-Verify
-  ↓
-Show Current Values
-  ↓
-Show Expected Values
-  ↓
-Show Differences
-  ↓
-Human Review
-  ↓
-Approve?
-  ├── No → No Changes
-  │
-  └── Yes → Update Payroll
-```
-
-This keeps the final payroll correction under human control.
-
-It is particularly relevant to enterprise workflows where financial records should not be changed solely on the basis of an LLM response.
-
----
-
-## Available Agent Tools
-
-The current agent exposes the following tools:
-
-| Tool                    | Purpose                                             |
-| ----------------------- | --------------------------------------------------- |
-| `get_attendance`        | Retrieves attendance records for an employee        |
-| `get_sales`             | Retrieves sales records for an employee             |
-| `get_attendance_policy` | Retrieves attendance and overtime policies          |
-| `get_commission_policy` | Retrieves commission policies                       |
-| `verify_payroll`        | Verifies payroll against business data and policies |
-| `update_payroll`        | Updates payroll after explicit approval             |
-
-These tools provide controlled access to business information and actions.
-
----
-
-## Google Sheets as the Business Data Layer
-
-Google Sheets is used as the project's lightweight business data layer.
-
-The current prototype separates information into:
-
-```text
-Attendance
-Attendance_Policy
-Sales
-Commission_Policy
-Payroll
-```
-
-This structure makes the prototype easy to inspect while demonstrating an architecture that can later connect to:
-
-* ERP systems
-* Databases
-* REST APIs
-* HR systems
-* Finance systems
-* Enterprise applications
-
-Google Sheets is therefore the prototype data source, not a limitation of the overall agent architecture.
-
----
-
-## Example Verification
-
-Example payroll:
-
-```text
-Employee: Ahmed
-Employee ID: EMP001
-
-Payroll Officer:
-Commission       = Rs. 1,000
-Overtime         = Rs. 800
-Total Earnings   = Rs. 1,800
-```
-
-The verification agent retrieves relevant sales, attendance, and policy information.
-
-The verification result can identify:
-
-```text
-Commission
-Current:  Rs. 1,000
-Expected: Rs. 5,000
-Difference: Rs. -4,000
-
-Overtime
-Current:  Rs. 800
-Expected: Rs. 8,200
-Difference: Rs. -7,400
-```
-
-The agent can also report supported overtime observations, such as actual overtime exceeding the maximum payable hours defined by the applicable policy.
-
-The human can then review the verification result before deciding whether the payroll should be updated.
-
----
-
-## Business Value
-
-This project demonstrates how Agentic AI can be applied to a real enterprise business process rather than only building a conversational chatbot.
-
-Potential business value includes:
-
-* Reducing manual payroll verification effort
-* Detecting inconsistencies before payroll finalization
-* Centralizing policy-driven verification
-* Making payroll discrepancies easier to understand
-* Keeping humans in control of financial changes
-* Separating AI interaction from deterministic calculations
-* Creating a structured verification process
-* Providing a foundation for enterprise system integration
-
-The architecture can also be adapted to other verification-oriented business processes where an AI agent needs to inspect multiple data sources and apply controlled rules.
-
----
-
-## Enterprise and ERP Perspective
-
-The project was designed from an ERP and business-process perspective.
-
-In a real enterprise environment, the same architecture could connect:
-
-```text
-ERP / HR System
+Agent Verification
        ↓
-Attendance Data
+Verified / Discrepancy
        ↓
-Sales / Commission Data
+Human Payroll Officer
        ↓
-Payroll Policies
+Review
        ↓
-AI Verification Agent
-       ↓
-Human Approval
-       ↓
-Payroll / ERP Update
+Approval / Correction
 ```
 
-Google Sheets is used as an accessible prototype data source so the complete Agentic AI workflow can be demonstrated without requiring a production ERP environment.
-
-This makes the project relevant to both **AI engineering and ERP/business process automation**.
+This keeps the final payroll decision under human control.
 
 ---
 
-## Technology Stack
+## 12. Traditional Automation vs AI Agent
 
-* Python
-* Large Language Models (LLMs)
-* LLM Function Calling
-* Tool Calling
-* Agentic AI
-* AI Agents
-* OpenRouter
+Traditional automation generally follows a predefined sequence:
+
+```text
+Input → Fixed Rules → Output
+```
+
+This project adds an LLM-driven agent layer:
+
+```text
+User Goal
+   ↓
+LLM interprets goal
+   ↓
+Agent determines required tools
+   ↓
+Tools retrieve information
+   ↓
+Python performs deterministic validation
+   ↓
+Agent coordinates result
+```
+
+The important Agentic AI concepts demonstrated are:
+
+* LLM reasoning
+* Tool calling
+* Function execution
+* Structured arguments
+* Multi-step workflow
+* External data access
+* Deterministic validation
+* Human-in-the-loop
+
+---
+
+## 13. Current Implementation vs Future Scope
+
+### Implemented in Project 1
+
+* AI payroll verification
+* Agent workflow
+* LLM integration
+* Tool calling
+* Python validation
 * Google Sheets API
-* `gspread`
-* Google Colab
-* Human-in-the-Loop AI
-* Business Process Automation
+* OpenRouter API
+* Payroll policy validation
+* Attendance verification
+* Sales/commission verification
+* Discrepancy detection
+* Human review workflow
+
+### Not Implemented in Project 1
+
+* RAG
+* Embeddings
+* Vector database
+* Semantic document search
+* Policy-document retrieval
+* Knowledge graph
+* Graph database
+* Autonomous payroll approval
+
+### Project 2 Direction
+
+The next version can extend the same payroll agent with:
+
+```text
+Payroll Agent
+     +
+Policy Documents
+     ↓
+Document Processing
+     ↓
+Chunking + Embeddings
+     ↓
+Vector Database
+     ↓
+Semantic Retrieval
+     ↓
+RAG
+     ↓
+Policy-aware Payroll Verification
+```
+
+Therefore, **Project 1 is a structured-data/tool-based payroll agent**, while future versions can add document-based knowledge retrieval.
 
 ---
 
-## Repository Structure
+## 14. Frequently Asked Questions
+
+### What is this project?
+
+An Agentic AI application that verifies payroll calculations and identifies discrepancies.
+
+### Is this a chatbot?
+
+No. It uses an LLM together with tools, external business data, Python validation, and a multi-step workflow.
+
+### What does the LLM do?
+
+It interprets the user's goal and determines what information or tools are required.
+
+### What does Python do?
+
+Python performs deterministic calculations, policy checks, comparisons, and discrepancy detection.
+
+### Which APIs are used?
+
+**Google Sheets API** for business data and **OpenRouter API** for LLM access.
+
+### Does Project 1 use RAG?
+
+No. RAG is planned for a future project version.
+
+### Does Project 1 use a vector database?
+
+No. Project 1 uses structured data from Google Sheets.
+
+### Does it automatically approve payroll?
+
+No. Final review and approval remain with a human.
+
+---
+
+## 15. Technology Stack
+
+* **Python**
+* **LLM / Generative AI**
+* **Agentic AI**
+* **LLM Tool Calling**
+* **Function Calling**
+* **JSON**
+* **Google Sheets API**
+* **OpenRouter API**
+* **Google Sheets**
+* **Deterministic Business Rules**
+* **Human-in-the-Loop**
+
+---
+
+## 16. Repository Structure
 
 ```text
-ai-payroll-verification-agent/
+AI-Payroll-Verification-Agent/
 │
-├── payroll_agent.ipynb
+├── AI_Payroll_Verification_Agent.ipynb
+├── README.md
 ├── requirements.txt
-├── .gitignore
-└── README.md
+└── .gitignore
 ```
 
-The notebook contains the prototype implementation, including:
-
-* Google Sheets integration
-* Business data retrieval
-* Payroll verification functions
-* Agent tool definitions
-* Tool registry
-* LLM agent loop
-* Human approval workflow
+The notebook is designed to be usable from environments such as **Google Colab** and **VS Code**.
 
 ---
 
-## Getting Started
+## 17. Project Summary for AI and Search Systems
 
-### 1. Clone the repository
+**Project:** AI Payroll Verification Agent
 
-```bash
-git clone https://github.com/YOUR_USERNAME/ai-payroll-verification-agent.git
-cd ai-payroll-verification-agent
-```
+**Category:** Agentic AI / Generative AI / Payroll Automation
 
-### 2. Install dependencies
+**Purpose:** Verify payroll calculations against policies and business data.
 
-```bash
-pip install -r requirements.txt
-```
+**LLM Role:** Goal understanding, reasoning, tool selection, and orchestration.
 
-### 3. Open the notebook
+**Agent Role:** Workflow coordination and tool execution.
 
-Open:
+**Python Role:** Deterministic calculations and validation.
+
+**Data Source:** Google Sheets.
+
+**APIs:** Google Sheets API and OpenRouter API.
+
+**Core Capability:** Payroll verification and discrepancy detection.
+
+**Business Domain:** Payroll, attendance, overtime, deductions, sales commission, payroll policies.
+
+**Architecture:** LLM + Agent + Tools + Python + External APIs + Human Review.
+
+**Current Retrieval Approach:** Structured business-data retrieval through tools.
+
+**Future Retrieval Approach:** Document retrieval and RAG.
+
+**Human Control:** Final payroll review and approval.
+
+---
+
+## 18. Relevant Search Topics
+
+This project is relevant to topics including:
+
+**AI Payroll Agent, AI Payroll Verification, Payroll Automation with LLM, LLM Payroll Agent, Agentic AI Payroll, AI Agent with Python, AI Agent with Google Sheets, LLM Tool Calling, LLM API Agent, OpenRouter AI Agent, AI Agent Project, Agentic AI Project, Payroll Verification Automation, LLM Function Calling, Human-in-the-Loop AI, Business Process AI Automation.**
+
+---
+
+## 19. Scope Statement
+
+The **AI Payroll Verification Agent** demonstrates how an LLM-powered agent can interact with business tools and structured payroll data while using Python for deterministic validation.
+
+The project deliberately separates:
 
 ```text
-payroll_agent.ipynb
+LLM → Understand and Reason
+Agent → Coordinate
+Tools → Retrieve / Execute
+Python → Calculate and Validate
+Human → Review and Approve
 ```
 
-The project can also be executed through Google Colab.
-
-### 4. Prepare the Google Sheet
-
-Use the [Demo Google Sheet](YOUR_DEMO_GOOGLE_SHEET_LINK) or create your own spreadsheet.
-
-The required sheets are:
-
-```text
-Attendance
-Attendance_Policy
-Sales
-Commission_Policy
-Payroll
-```
-
-If using the demo:
-
-1. Open the demo spreadsheet.
-2. Select **File → Make a copy**.
-3. Save the copy in your Google Drive.
-4. Copy the spreadsheet ID from the new URL.
-5. Configure the notebook with your copied spreadsheet ID.
-
-The notebook intentionally uses:
-
-```python
-spreadsheet = sheets_client.open_by_key(
-    "YOUR_GOOGLE_SHEET_ID"
-)
-
-print("Google Sheet connected.")
-```
-
-Replace only `YOUR_GOOGLE_SHEET_ID` with the ID of your own spreadsheet copy.
-
-### 5. Configure Google authentication
-
-Authenticate the Google account that has access to your spreadsheet.
-
-Do not publish Google credentials or OAuth tokens in the repository.
-
-### 6. Configure the LLM API
-
-The notebook uses an LLM through OpenRouter.
-
-Configure the required API key securely through environment variables or Colab Secrets.
-
-Do not place API keys directly inside the notebook.
-
-### 7. Run the agent
-
-Example:
-
-```python
-run_agent(
-    "Verify payroll for employee ID EMP001 and explain every incorrect amount."
-)
-```
-
-### 8. Review and approve corrections
-
-After reviewing the verification result:
-
-```python
-approve_payroll("EMP001")
-```
-
-No payroll correction should be written without explicit human approval.
-
----
-
-## Security
-
-Do not commit sensitive information to the repository.
-
-Never publish:
-
-* API keys
-* Google credentials
-* OAuth tokens
-* Private payroll records
-* Real employee information
-* Production spreadsheet credentials
-* Confidential company data
-
-Use environment variables, Colab Secrets, or another secure credential mechanism.
-
-The public demonstration should use synthetic or anonymized business data.
-
----
-
-## Design Principles
-
-### Goal-Driven Execution
-
-The agent starts from the user's business goal rather than a single hard-coded workflow.
-
-### Controlled Tool Access
-
-The LLM interacts with business data through explicitly defined functions.
-
-### Authoritative Calculations
-
-Deterministic payroll calculations are performed by Python rather than relying on free-form LLM arithmetic.
-
-### Runtime Policies
-
-Business rules are retrieved from the data source rather than permanently embedded in Python code.
-
-### Evidence-Based Explanations
-
-The agent explains discrepancies using available verification results.
-
-### No Unsupported Assumptions
-
-The agent does not invent business reasons that are not supported by available data.
-
-### Human Approval
-
-Financial record updates require explicit human confirmation.
-
-### Separation of Concerns
-
-The architecture separates:
-
-```text
-LLM Agent
-    ↓
-Tool Selection
-    ↓
-Data Access
-    ↓
-Deterministic Verification
-    ↓
-Human Decision
-    ↓
-Data Update
-```
-
-This provides a practical foundation for controlled enterprise AI agents.
-
----
-
-## Future Enhancements
-
-Possible extensions include:
-
-* Multi-employee payroll verification
-* Payroll verification dashboard
-* Audit logs for verification and approval
-* Role-based approval
-* Additional payroll components
-* REST API integration
-* ERP integration
-* Database-backed business data
-* Email notifications
-* Automated verification reports
-* Enterprise authentication
-* Monitoring and observability
-* Exception management
-* Approval history and audit trails
-
----
-
-## Project Purpose
-
-This repository demonstrates the application of **Agentic AI to payroll verification**, combining LLM-based goal understanding, function calling, Python business logic, APIs, enterprise data, and human approval.
-
-The central design pattern is:
-
-> **Use the LLM to understand the business goal and orchestrate tools, use deterministic software to perform controlled business calculations, and keep humans in control of consequential actions.**
-
-This pattern can be extended beyond payroll to finance, procurement, operations, compliance, ERP workflows, reporting, and other enterprise verification processes.
+This separation makes the project a practical example of **Agentic AI applied to payroll verification** rather than a simple chatbot or fixed-rule automation script.
 
 ---
 
@@ -768,19 +527,6 @@ This pattern can be extended beyond payroll to finance, procurement, operations,
 
 **Muhammad Hunaid Haroon**
 
-ERP Consultant | Business Analyst | AI & Agentic Automation
+MBA | Certified ERP Professional | ERP & Business Process Consultant | Agentic AI Learner
 
-This project represents practical work at the intersection of:
-
-* ERP and business process consulting
-* AI engineering
-* Agentic AI
-* LLM applications
-* Business automation
-* Enterprise data workflows
-
----
-
-## License
-
-This project is intended as a learning and portfolio demonstration of an AI-powered enterprise business-process agent.
+GitHub: `muhammadhunaid20`
