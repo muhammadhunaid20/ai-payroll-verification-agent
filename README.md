@@ -370,6 +370,8 @@ The important Agentic AI concepts demonstrated are:
 * Policy-document retrieval
 * Knowledge graph
 * Graph database
+* ERPNext Integration
+* Odoo ERP Integration
 * Autonomous payroll approval
 
 ### Project 2 Direction
@@ -465,7 +467,7 @@ The notebook is designed to be usable from environments such as **Google Colab**
 
 ---
 
-## 17. Project Summary for AI and Search Systems
+## 17. Project Summary
 
 **Project:** AI Payroll Verification Agent
 
@@ -497,15 +499,7 @@ The notebook is designed to be usable from environments such as **Google Colab**
 
 ---
 
-## 18. Relevant Search Topics
-
-This project is relevant to topics including:
-
-**AI Payroll Agent, AI Payroll Verification, Payroll Automation with LLM, LLM Payroll Agent, Agentic AI Payroll, AI Agent with Python, AI Agent with Google Sheets, LLM Tool Calling, LLM API Agent, OpenRouter AI Agent, AI Agent Project, Agentic AI Project, Payroll Verification Automation, LLM Function Calling, Human-in-the-Loop AI, Business Process AI Automation.**
-
----
-
-## 19. Scope Statement
+## 18. Scope Statement
 
 The **AI Payroll Verification Agent** demonstrates how an LLM-powered agent can interact with business tools and structured payroll data while using Python for deterministic validation.
 
